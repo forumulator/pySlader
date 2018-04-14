@@ -99,3 +99,11 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# book data
+.slader*
+
+# IntelliJ
+.idea/
+*.json
+.code
