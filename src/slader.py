@@ -9,6 +9,8 @@ BASE_URL = r"http://8bbzgj41nl-dsn.algolia.net/1/indexes/textbook_index?x-algoli
 &x-algolia-application-id=8BBZGJ41NL&x-algolia-api-key=ed21ea5a6b4a9a84643f2a0e81171470&callback=algoliaJSONP_2&query=&facets=*\
 &facetFilters=%5B%22subject_ids%3A30%22%5D&maxValuesPerFacet=50&hitsPerPage=50&page="
 
+CS_JSON = "all_cs.json"
+
 def page_books(url):
 	res_str = urllib.request.urlopen(url).read().decode("utf-8")
 	l, r = res_str.find("{"), res_str.rfind("}")
@@ -16,8 +18,7 @@ def page_books(url):
 		js_str = res_str[l:(r+1)]
 
 	json_obj = json.loads(js_str)
-	return json_obj["hits"]There is no Internet connection
-
+	return json_obj["hits"]
 
 
 def get_all_books(page_count):
@@ -26,7 +27,7 @@ def get_all_books(page_count):
 		url = BASE_URL + str(pg)
 		all_books += page_books(url)
 	all_books_dict = {"books": all_books}
-	with open("all_cs.json", "w") as outfile:
+	with open(CS_JSON, "w") as outfile:
 		json.dump(all_books_dict, outfile)
 	return all_books_dict
 
@@ -62,7 +63,7 @@ def print_new_books(filled_books):
 
 SLADER_BASE = "https://slader.com"
 FILLED_BOOKS_FILE = ".sladerfilledcs"
-def find_all_filled_books(file_name="all_cs.json"):
+def find_all_filled_books(file_name):
 	with open(file_name, "r") as infile:
 		g = json.load(infile)
 
@@ -79,6 +80,8 @@ def find_all_filled_books(file_name="all_cs.json"):
 		json.dump({isbn: title for isbn, title in filled_books}, fbf, indent=4)
 
 if __name__ == "__main__":
-	find_all_filled_books()
+	if not os.path.exists(CS_JSON):
+		get_all_books(10)
+	find_all_filled_books(CS_JSON)
 		
 
