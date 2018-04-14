@@ -1,0 +1,29 @@
+\name problem-solving-withg-c-9th-edition
+\isbn 9780133591743
+\exname practice-programs
+
+\sol_start
+
+
+\sol 247 9
+\row
+We define a two argument variant and the ternanry operator to compare two numbers. We then use this variant to define the three number variant
+
+
+\row
+\begin{verbatim}
+#include <iostream>
+
+using namespace std;
+
+double max(double a, double b) {
+    return a > b ? a : b;
+}
+
+// Using the two argument variant to define this one
+double max(double a, double b, double c) {
+    return max(a, max(b, c));
+}
+
+\end{verbatim}
+\end
