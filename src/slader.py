@@ -5,11 +5,9 @@ from socket import timeout
 import threadpool
 import queue
 
-BASE_URL = r"http://8bbzgj41nl-dsn.algolia.net/1/indexes/textbook_index?x-algolia-agent=Algolia%20for%20vanilla%20JavaScript%203.24.11\
-&x-algolia-application-id=8BBZGJ41NL&x-algolia-api-key=ed21ea5a6b4a9a84643f2a0e81171470&callback=algoliaJSONP_2&query=&facets=*\
-&facetFilters=%5B%22subject_ids%3A30%22%5D&maxValuesPerFacet=50&hitsPerPage=50&page="
+BASE_URL = r'http://8bbzgj41nl-dsn.algolia.net/1/indexes/textbook_index?x-algolia-agent=Algolia%20for%20vanilla%20JavaScript%203.24.11&x-algolia-application-id=8BBZGJ41NL&x-algolia-api-key=ed21ea5a6b4a9a84643f2a0e81171470&callback=algoliaJSONP_2&query=&facets=*&facetFilters=%5B%22subject_ids%3A30%22%5D&maxValuesPerFacet=50&hitsPerPage=500&page='
 
-CS_JSON = "all_cs.json"
+CS_JSON = ".allcs.json"
 
 def page_books(url):
 	res_str = urllib.request.urlopen(url).read().decode("utf-8")
@@ -23,9 +21,11 @@ def page_books(url):
 
 def get_all_books(page_count):
 	all_books = []
-	for pg in range(page_count):
+	for pg in range(page_count + 1):
+		print("Reading page: " + str(pg))
 		url = BASE_URL + str(pg)
 		all_books += page_books(url)
+	print("We received a total of: " + str(len(all_books)) + " books")
 	all_books_dict = {"books": all_books}
 	with open(CS_JSON, "w") as outfile:
 		json.dump(all_books_dict, outfile)
@@ -36,6 +36,7 @@ def is_empty(url):
 	try:
 		html = urllib.request.urlopen(url, timeout = 10).read().decode("utf-8")
 	except timeout:
+		print("Timeout for url: " + url)
 		return False
 	soup = BeautifulSoup(html, "html.parser")
 	toc = soup.find("article", {"class": "toc"})
@@ -55,7 +56,7 @@ def print_new_books(filled_books):
 		with open(FILLED_BOOKS_FILE, "r") as fbf:
 			old_books = json.load(fbf)
 
-	print("************** Newly Added Books **************")
+	print("\n************** Newly Added Books **************")
 	for isbn, title in filled_books:
 		if isbn not in old_books:
 			print(isbn, title)
@@ -81,7 +82,9 @@ def find_all_filled_books(file_name):
 
 if __name__ == "__main__":
 	if not os.path.exists(CS_JSON):
-		get_all_books(10)
+		print("Getting books from the database.")
+		get_all_books(2)
+	print("")
 	find_all_filled_books(CS_JSON)
 		
 
